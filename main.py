@@ -54,7 +54,7 @@ def process_zodiac_sign(message):
 def generate_response(user_question, cards_message):
     payload = {
         "role": "assistant",
-        "model": "llama3.1",
+        "model": "llama3",
         "prompt": "From now on you will take on the role of tarot interpreter. Your task is to help the user uncover the symbolic messages of the tarot and apply them to the specific situation the user will share. Please remember that the interpretations of the tarot cards are subjective and aim to promote reflection and self-knowledge. Be respectful and sensitive when dealing with personal issues. Don't respond with questions. Respond with direct and objective language, providing insights and short guidance, with a maximum of 600 characters, based on the cards indicated below:\n\n" + cards_message + "\n\n" + user_question,
     }
 

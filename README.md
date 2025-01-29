@@ -2,7 +2,7 @@
 
 ## About
 
-MystiConsult_bot is a Telegram bot that offers Tarot and horoscope readings. Runing the Llama 3.1, the bot provides insights and guidance on personal, professional and spiritual issues through a simple and direct interaction.
+MystiConsult_bot is a Telegram bot that offers Tarot and horoscope readings. Runing with the Llama 3.1, the bot provides insights and guidance on personal, professional and spiritual issues through a simple and direct interaction.
 
 ## Features
 

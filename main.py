@@ -54,7 +54,7 @@ def process_zodiac_sign(message):
 def generate_response(user_question, cards_message):
     payload = {
         "role": "assistant",
-        "model": "llama3",
+        "model": "llama3.1",
         "prompt": "From now on you will take on the role of tarot interpreter. Your task is to help the user uncover the symbolic messages of the tarot and apply them to the specific situation the user will share. Please remember that the interpretations of the tarot cards are subjective and aim to promote reflection and self-knowledge. Be respectful and sensitive when dealing with personal issues. Don't respond with questions. Respond with direct and objective language, providing insights and short guidance, with a maximum of 600 characters, based on the cards indicated below:\n\n" + cards_message + "\n\n" + user_question,
     }
 
@@ -71,18 +71,28 @@ def generate_response(user_question, cards_message):
 def generate_response_horoscope(user_sign):
     payload = {
         "role": "user",
-        "model": "llama3",
+        "model": "llama3.1",
         "prompt": user_sign + " It's my zodiac sign! What is my horoscope for the day? Don't respond with questions. Respond with direct and objective language, providing insights and short guidance, with a maximum of 200 characters",
     }
 
     try:
         response = requests.post(LLM_API_URL, json=payload)
+        
+        if response.status_code != 200:
+            return "Erro ao obter resposta do Llama. Tente novamente mais tarde."
+
         response_lines = response.text.strip().split('\n')
-        concatenated_response = "".join([json.loads(line)["response"] for line in response_lines if "response" in json.loads(line)])
+        concatenated_response = "".join([
+            json.loads(line).get("response", "") for line in response_lines if "response" in json.loads(line)
+        ]).strip()
+
+        if not concatenated_response:
+            return "Não consegui obter uma resposta válida. Tente novamente."
+
         return concatenated_response
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Erro: {str(e)}"
 
 # Função para iniciar a leitura das cartas do Tarot
 def interpret_tarot(message):
@@ -99,7 +109,7 @@ def process_question(message):
     if message.text == "Realizar leitura de Tarot":
         interpret_tarot(message)
     elif message.text == "Entender o funcionamento do bot":
-        bot.send_message(message.chat.id, "Eu sou um bot que oferece leituras de tarô e horóscopo. Utilizando a API Llama3, meu objetivo é oferecer insights e orientações sobre questões pessoais, profissionais e espirituais por meio de uma interação misticas e milenares.")
+        bot.send_message(message.chat.id, "Eu sou um bot que oferece leituras de tarô e horóscopo. Utilizando a API Llama 3.1, meu objetivo é oferecer insights e orientações sobre questões pessoais, profissionais e espirituais por meio de uma interação misticas e milenares.")
     elif message.text == "Aprender sobre Tarot e horóscopos":
         bot.send_message(message.chat.id, "O Tarot é um sistema de leitura de cartas que utiliza imagens e símbolos para fornecer insights e orientações sobre questões pessoais, profissionais e espirituais.\n\nJá a leitura de horóscopos é uma forma de adivinhação que utiliza a posição dos astros no momento do nascimento de uma pessoa para prever aspectos da sua personalidade e eventos da sua vida.")
     else:
@@ -121,11 +131,17 @@ def process_question(message):
 # Função para processar a pergunta do usuário e gerar a resposta do horóscopo
 def process_question_horoscope(message):
     user_sign = message.text
-    if user_sign in zodiac_signs: # Verifica se o texto da mensagem é um signo válido
+    if user_sign in zodiac_signs:  # Verifica se o texto da mensagem é um signo válido
         sent_message = bot.send_message(message.chat.id, "🔮 Estou consultando as estrelas. Me dê uns segundinhos...")
         message_id = sent_message.message_id
         response = generate_response_horoscope(user_sign)
-        translation = translate_text(response)
+        translation = translate_text(response).strip()
+
+        # Verifica se a tradução gerou um texto válido
+        if not translation:
+            bot.send_message(message.chat.id, "Desculpe, não consegui gerar seu horóscopo. Tente novamente mais tarde.")
+            return
+
         bot.edit_message_text(chat_id=message.chat.id, message_id=message_id, text=translation)
         bot.send_message(message.chat.id, "Espero que tenha gostado da consulta! 😉\n\nSelecione o que você deseja fazer agora:", reply_markup=markup)
     else:
@@ -141,7 +157,7 @@ def handle_message(message):
     if message.text == "Realizar leitura de Tarot":
         interpret_tarot(message)
     elif message.text == "Entender o funcionamento do bot":
-        bot.send_message(message.chat.id, "Eu sou um bot que oferece leituras de tarô e horóscopo. Utilizando a API Llama3, meu objetivo é oferecer insights e orientações sobre questões pessoais, profissionais e espirituais por meio de uma interação misticas e milenares.")
+        bot.send_message(message.chat.id, "Eu sou um bot que oferece leituras de tarô e horóscopo. Utilizando a API Llama 3.1, meu objetivo é oferecer insights e orientações sobre questões pessoais, profissionais e espirituais por meio de uma interação misticas e milenares.")
     elif message.text == "Aprender sobre Tarot e horóscopos":
         bot.send_message(message.chat.id, "O Tarot é um sistema de leitura de cartas que utiliza imagens e símbolos para fornecer insights e orientações sobre questões pessoais, profissionais e espirituais.\n\nJá a leitura de horóscopos é uma forma de adivinhação que utiliza a posição dos astros no momento do nascimento de uma pessoa para prever aspectos da sua personalidade e eventos da sua vida.")
     elif message.text == "Consultar meu horóscopo":

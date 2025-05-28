@@ -1,6 +1,51 @@
+# Ambiente virtual
+venv/
+env/
+ENV/
 
-APIs.py
-APIs.py
-APIs.py
-__pycache__/APIs.cpython-313.pyc
-.vscode/settings.json
+# Arquivos Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Arquivos de configuração
+config/settings.py
+.env
+
+# Logs
+*.log
+logs/
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Arquivos de banco de dados
+*.db
+*.sqlite3
+
+# Arquivos temporários
+*.tmp
+*.bak
+*.swp
+*~
